@@ -1,29 +1,29 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Онлайн-чат</title>
+        <title>Web-chat</title>
         <script type='text/javascript' src='LongPoll.js'></script>
         <script type='text/javascript' src='cookies.js'></script>
         <script type='text/javascript' src='Chat.js'></script>
     </head>
     <body>
-        <h1 style="color: green;">Онлайн-чат</h1>
+        <h1 style="color: green;">Web-chat</h1>
         <div id="auth">
-            <h4>Имя пользователя</h4>
+            <h4>Username</h4>
             <input type="text" id="sender"><br><br>
-            <input type="button" onclick="chat.join();" id="join_button" value="Войти в чат"><br><br>
+            <input type="button" onclick="chat.join();" id="join_button" value="Join"><br><br>
             <div id="authresult"><span style='color: white;'>_</span></div>
         </div>
         <div id="anothertab" style="display: none;">
-            <p>Вы уже вошли в чат из другой вкладки</p>
+            <p>You're already logged in from another browser tab</p>
         </div>
         <div id="chat">
             <input type="button" value="Покинуть чат" onclick="chat.leave();">
-            <h4>Сообщение</h4>
-            <b style="color: red; font-size: 80%;" id="lc">Соединение с сервером было потеряно.<br>Выполняется попытка переподключения...<br><br></b>
+            <h4>Message</h4>
+            <b style="color: red; font-size: 80%;" id="lc">Connection was lost.<br>Trying to restore connection...<br><br></b>
             <textarea id="message"></textarea><br><br>
         
-            <input type="button" id="send_message_button" onclick="chat.send();" value="Отправить"><br><br>
+            <input type="button" id="send_message_button" onclick="chat.send();" value="Send"><br><br>
         
             <div id="result"><span style='color: white;'>_</span></div>
             <hr>
