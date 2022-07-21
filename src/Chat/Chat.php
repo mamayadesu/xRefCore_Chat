@@ -1,5 +1,7 @@
 <?php
 
+declare(ticks=1);
+
 namespace Chat;
 
 use Data\String\ColoredString;
