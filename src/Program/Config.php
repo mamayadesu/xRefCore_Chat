@@ -12,9 +12,9 @@ class Config
     public int $MaxUsersWithSameIp = 1;
 
     /**
-     * Load config
+     * Загружает конфиг
      *
-     * @return bool Returns FALSE if config.json doesn't exist
+     * @return bool Возвращает FALSE если config.json не найден или повреждён
      */
     public function Load() : bool
     {

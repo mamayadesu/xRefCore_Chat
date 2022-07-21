@@ -21,10 +21,10 @@ class Router
 
     /**
      * #################
-     * HERE WE ARE HANDLING DYNAMIC PAGES LIKE `mypage.php`.
+     * ЗДЕСЬ МЫ ОБРАБАТЫВАЕМ ДИНАМИЧЕСКИЕ СТРАНИЦЫ ПО ТИПУ `mypage.php`.
      *
-     * YOU DON'T NEED TO CREATE .php FILES IN YOUR DOCUMENT ROOT,
-     * JUST ADD URI OF YOUR PAGE TO "SWITCH" BELOW
+     * НЕ НУЖНО СОЗДАВАТЬ .php ФАЙЛЫ В КОРНЕ САЙТА,
+     * ПРОСТО ДОБАВЬТЕ URI СТРАНИЦЫ В "SWITCH" НИЖЕ
      * #################
      */
     public function HandleRequest(Request $request, Response $response) : bool
@@ -230,8 +230,8 @@ class Router
             return;
         }
 
-        // The user could lose the connection, and new data could arrive.
-        // Checking if the user missed the new data.
+        // Пользователь мог потерять соединение, а новые данные могли прийти
+        // Проверяем, пропустил ли юзер новые данные
         if (count($user->UnreadEvents) > 0)
         {
             $result = "";
@@ -245,9 +245,9 @@ class Router
             return;
         }
 
-        // We do not send a response to the user immediately.
-        // We wait 25 seconds for new data to appear.
-        // Otherwise, terminate the connection
+        // Не отвечаем пользователю на запрос сразу
+        // Ждём появления новых данных в течение 25 секунд
+        // В противном случае закрываем соединение
         $params = new AsyncTaskUserParams();
         $params->User = $user;
         $user->Request = $request;
@@ -340,7 +340,7 @@ class Router
             return;
         }
 
-        // removing user from chat
+        // Удаляем пользователя из чата
         $this->main->chat->Kick($user->Username, "", true);
 
         $response->End("OK");

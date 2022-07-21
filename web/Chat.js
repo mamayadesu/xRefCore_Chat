@@ -62,53 +62,53 @@ class Chat {
                 self.lostconnection = false;
                 document.getElementById("lc").style.display = "none";
                 self.loadMessages();
-                window.alert("Connection restored!");
+                window.alert("Соединение с сервером восстановлено!");
             }
             if(data["type"] == "message") {
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <b>"+data['sender']+":</b> "+data['message']+"</pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "system") {
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>"+data['message']+"</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "connected") {
-                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" joined to chat.</i></pre>"+document.getElementById("messages").innerHTML;
+                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" вошёл в чат.</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "disconnected") {
-                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" left (disconnected).</i></pre>"+document.getElementById("messages").innerHTML;
+                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" покинул чат (disconnected).</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "timed out") {
-                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" left ("+data["username"]+" timed out).</i></pre>"+document.getElementById("messages").innerHTML;
+                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" покинул чат ("+data["username"]+" timed out).</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "kicked") {
                 if(data['username'] == self.username) {
                     self.lp.halt();
-                    var kicktext = "You were kicked by next reason: "+data["reason"];
+                    var kicktext = "Вы были исключены из чата. Причина: "+data["reason"];
                     switch (data["reason"]) {
                         case "Unauthorized":
-                            kicktext = "You have been automatically disconnected from the chat. This may have occurred due to the fact that your computer or phone did not respond to server requests for a long time. Enter your username and enter the chat again.";
+                            kicktext = "Вы были автоматически отключены от чата. Возможно, это возникло из-за того, что ваш компьютер или телефон долго не отвечали на запросы сервера. Введите свой ник и войдите в чат снова.";
                             break;
                     }
                     window.alert(kicktext); 
                     self.chat.style.display = "none";
                     self.auth.style.display = "block";
                 }
-                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" left ("+data['reason']+").</i></pre>"+document.getElementById("messages").innerHTML;
+                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" покинул чат ("+data['reason']+").</i></pre>"+document.getElementById("messages").innerHTML;
             }
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "New data received", data]);
+            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Получены новые данные", data]);
         });
         
         this.lp.on("halted", function() {
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Halt"]);
+            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Остановлено"]);
         });
             
         this.lp.on("error", function(data) {
             if(!self.lostconnection)
             {
                 document.getElementById("lc").style.display = "";
-                window.alert("Connection lost.");
+                window.alert("Ошибка подключения к серверу.");
             }
             self.lostconnection = true;
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Connection lost", data]);
+            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Ошибка соединения с сервером", data]);
         });
             
         this.lp.on("timeout", function() {
             window.alert("Утеряно соединение с сервером.");
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Malp]", "Connection timeout"]);
+            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Malp]", "Время ожидания истекло"]);
         });
             
         this.lp.on("hibernation", function() {
@@ -116,7 +116,7 @@ class Chat {
                 self.lostconnection = false;
                 document.getElementById("lc").style.display = "none";
                 self.loadMessages();
-                window.alert("Connection restored!");
+                window.alert("Соединение с сервером восстановлено!");
             }
         });
     }
@@ -128,7 +128,7 @@ class Chat {
         document.getElementById("messages").innerHTML = "";
         xhr.ontimeout = function()
         {
-            window.alert("Failed to load messages. Connection timeout");
+            window.alert("Ошибка при загрузке сообщений. Время ожидания истекло.");
         };
         var self = this;
         xhr.onreadystatechange = function() {
@@ -159,17 +159,17 @@ class Chat {
                             } else if(data["type"] == "system") {
                                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>"+data['message']+"</i></pre>"+document.getElementById("messages").innerHTML;
                             } else if(data["type"] == "connected") {
-                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data['username']+" joined chat.</i></pre>"+document.getElementById("messages").innerHTML;
+                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data['username']+" вошёл в чат.</i></pre>"+document.getElementById("messages").innerHTML;
                             } else if(data["type"] == "disconnected") {
-                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data['username']+" left (disconnected).</i></pre>"+document.getElementById("messages").innerHTML;
+                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data['username']+" покинул чат (disconnected).</i></pre>"+document.getElementById("messages").innerHTML;
                             } else if(data["type"] == "timed out") {
-                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data['username']+" left ("+data['username']+" timed out).</i></pre>"+document.getElementById("messages").innerHTML;
+                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data['username']+" покинул чат ("+data['username']+" timed out).</i></pre>"+document.getElementById("messages").innerHTML;
                             } else if(data["type"] == "kicked") {
-                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data['username']+" left ("+data['reason']+").</i></pre>"+document.getElementById("messages").innerHTML;
+                                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data['username']+" покинул чат ("+data['reason']+").</i></pre>"+document.getElementById("messages").innerHTML;
                             }
                         }
                     }
-                    console.log(count + " messages loaded.");
+                    console.log(count + " сообщений загружено.");
                 }
             }
         }
@@ -192,7 +192,7 @@ class Chat {
     
     join() {
         document.getElementById("join_button").disabled = true;
-        document.getElementById("join_button").value = "Connecting...";
+        document.getElementById("join_button").value = "Выполняется вход...";
         var authresult_block = document.getElementById("authresult");
         authresult_block.innerHTML = "<span style='color: white;'>_</span>"; 
         var http = new XMLHttpRequest();
@@ -201,16 +201,16 @@ class Chat {
         var self = this;
         http.ontimeout = function() {
             document.getElementById('join_button').disabled = false;
-            document.getElementById('join_button').value = "Join";
+            document.getElementById('join_button').value = "Войти в чат";
             self.chat.style.display = "none";
             self.auth.style.display = "block";
-            authresult.innerHTML = "Connection timeout.";
+            authresult.innerHTML = "Истекло время ожидания соединения с сервером.";
         };
         http.onreadystatechange = function() {
             if(http.readyState == 4) {
                 if(http.status == 200) {
                     document.getElementById("join_button").disabled = false;
-                    document.getElementById("join_button").value = "Join";
+                    document.getElementById("join_button").value = "Войти в чат";
                     switch(http.responseText) {
                         case "OK":
                             self.auth.style.display = "none";
@@ -224,49 +224,49 @@ class Chat {
                         case "TOOSHORT":
                             self.chat.style.display = "none";
                             self.auth.style.display = "";
-                            authresult.innerHTML = "Username is too short";
+                            authresult.innerHTML = "Логин слишком короткий";
                             break;
                             
                         case "TOOLONG":
                             self.chat.style.display = "none";
                             self.auth.style.display = "";
-                            authresult.innerHTML = "Username is too long";
+                            authresult.innerHTML = "Логин слишком длинный";
                             break;
                             
                         case "ALREADYUSING":
                             self.chat.style.display = "none";
                             self.auth.style.display = "";
-                            authresult.innerHTML = "Username is already using";
+                            authresult.innerHTML = "Логин уже используется";
                             break;
                             
                         case "WRITEYOURUSERNAME":
                             self.chat.style.display = "none";
                             self.auth.style.display = "";
-                            authresult.innerHTML = "Input username";
+                            authresult.innerHTML = "Введите логин";
                             break;
 
                         case "CHATISFULL":
                             self.chat.style.display = "none";
                             self.auth.style.display = "";
-                            authresult.innerHTML = "User's count limit is reached. Please wait when someone left.";
+                            authresult.innerHTML = "Чат достиг лимита пользователей. Подождите, пока кто-нибудь покинет чат.";
                             break;
 
                         case "DISABLED":
                             self.chat.style.display = "none";
                             self.auth.style.display = "";
-                            authresult.innerHTML = "Chat disabled.";
+                            authresult.innerHTML = "Чат отключён Администратором.";
                             break;
                             
                         case "TOOMANYUSERWITHTHISIP":
                             self.chat.style.display = "none";
                             self.auth.style.display = "";
-                            authresult.innerHTML = "Too many users with the same IP";
+                            authresult.innerHTML = "Слишком много пользователей в чате с этим IP-адресом";
                             break;
                     }
                 } else {
                     document.getElementById('join_button').disabled = false;
-                    document.getElementById('join_button').value = "Join";
-                    authresult_block.innerHTML = "Failed to authorize";
+                    document.getElementById('join_button').value = "Войти в чат";
+                    authresult_block.innerHTML = "Не удалось авторизоваться";
                 }
             }
         };
@@ -314,7 +314,7 @@ class Chat {
         http.timeout = 20000;
         http.ontimeout = function() {
             document.getElementById("send_message_button").disabled = false;
-            result_block.innerHTML = "Connection timeout.";
+            result_block.innerHTML = "Истекло время ожидания соединения с сервером.";
             document.getElementById("sending_message").innerHTML = "";
         }
         http.onreadystatechange = function() {
@@ -327,12 +327,12 @@ class Chat {
                         result_block.innerHTML = "<span style='color: white;'>_</span>";
                         document.getElementById("message").value = "";
                     } else if(http.responseText == "EMPTY") {
-                        result_block.innerHTML = "Fill all fields!";
+                        result_block.innerHTML = "Не все поля заполнены!";
                     } else if(http.responseText == "NOTAUTHORIZED") {
-                        result_block.innerHTML = "You are not authorized. This error may have occurred because the connection to the chat was lost. Refresh the page and enter your username again.";
+                        result_block.innerHTML = "Вы не авторизованы. Возможно, эта ошибка возникла из-за того, что соединение с чатом было утеряно. Обновите страницу и введите свой логин снова.";
                     }
                 } else {
-                    result_block.innerHTML = "Failed to send message";
+                    result_block.innerHTML = "Не удалось отправить сообщение";
                 }
             }
         }

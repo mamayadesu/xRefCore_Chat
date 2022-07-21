@@ -24,34 +24,34 @@ class Main
     public function __construct(array $args)
     {
         /**
-         * Loading config
+         * Загружаем конфиг
          */
         $this->config = new Config();
 
         /**
-         * Creating chat instance
+         * Создаём инстанцию чата
          */
         $this->chat = new Chat($this);
 
         /**
-         * Creating router instance
+         * Создаём инстанцию маршрутизатора
          */
         $this->router = new Router($this);
         if (!$this->config->Load())
         {
-            Console::WriteLine("Please setup config and start this program again");
+            Console::WriteLine("Пожалуйста, настройте конфиг и запустите это приложение снова.");
             return;
         }
 
         /**
-         * Adding Ctrl+C handler
+         * Добавляем обработчик Ctrl+C
          */
 
         if (IS_WINDOWS)
         {
             sapi_windows_set_ctrl_handler(function(int $event) : void
             {
-                // Shutting down chat on CTRL+C
+                // Выключаем чат при Ctrl+C
                 if ($event == PHP_WINDOWS_EVENT_CTRL_C)
                     $this->chat->Shutdown();
             }, true);
@@ -60,18 +60,18 @@ class Main
         {
             pcntl_signal(SIGINT, function() : void
             {
-                // Shutting down chat on CTRL+C
+                // Выключаем чат при Ctrl+C
                 $this->chat->Shutdown();
             });
         }
 
         /**
-         * Starting Web-server
+         * Запускаем веб-сервер
          */
         $this->StartServer();
 
         /**
-         * Load main menu
+         * Загружаем главное меню
          */
         $this->mainMenu = new MainMenu($this);
         $this->mainMenu->Start();
@@ -79,13 +79,13 @@ class Main
 
     /**
      * #################
-     * GETTING DIRECTORY CONTENT PAGE
+     * ПОЛУЧАЕМ СОДЕРЖИМОЕ ПАПКИ
      * #################
      */
     private function GetDirContentPage(string $requestUri, string $prevDirectory, string $target) : string
     {
         /**
-         * Adding slash to end of URI
+         * Добавляем слэш в конец URI
          */
         $ru = str_split($requestUri);
         if ($ru[count($ru) - 1] != "/")
@@ -107,13 +107,13 @@ class Main
 ";
 
         /**
-         * Scanning current directory
+         * Сканируем текущую директорию
          */
         foreach (scandir($target) as $name)
         {
             $nameEncoded = iconv("UTF-8", "WINDOWS-1251", $name);
             /**
-             * Getting full path to target directory on local machine to get file size
+             * Получаем полный путь к целевой папке для получения размера содержимого
              */
             $fullPathToTarget = $target . DIRECTORY_SEPARATOR . $name;
 
@@ -159,7 +159,7 @@ class Main
             }
 
             /**
-             * Removing "."
+             * Убираем "."
              */
             if ($name == ".")
             {
@@ -167,7 +167,7 @@ class Main
             }
 
             /**
-             * Adding this directory or file to <table>
+             * Добавляем эту папку или файл в <table>
              */
             $result .= "<tr><td><a href='" . $requestUri . $nameEncoded . "'>" . $nameEncoded . "</a></td><td>" . $targetType . "</td><td>" . $size . "</td><td>" . date("d.m.Y H:i:s", filemtime($fullPathToTarget)) . "</td></tr>\n";
         }
@@ -274,14 +274,14 @@ class Main
 
         /**
          * #################
-         * REQUEST HANDLER
+         * ОБРАБОТЧИК HTTP-ЗАПРОСОВ
          * #################
          */
         $this->server->On("request", function(Request $request, Response $response)
         {
             /**
              * #################
-             * CHECKING ROUTER
+             * ПРЕЖДЕ ВСЕГО ОБРАЩАЕМСЯ К МАРШРУТИЗАТОРУ
              * #################
              */
             if ($this->router->HandleRequest($request, $response))
@@ -291,13 +291,13 @@ class Main
 
             /**
              * *****************
-             * THE NEXT CODE WAS TAKEN FROM "xRefCore_HttpServerExample" REPOSITORY
+             * СЛЕДУЮЩИЙ КОД БЫЛ ВЗЯТ ИЗ РЕПОЗИТОРИЯ "xRefCore_HttpServerExample"
              * *****************
              */
 
             /**
              * #################
-             * REDIRECT TO index.html
+             * РЕДИРЕКТ НА index.html
              * #################
              */
             if ($request->RequestUri == "/" && file_exists($this->config->DocumentRoot . "index.html"))
@@ -310,7 +310,7 @@ class Main
 
             /**
              * #################
-             * REMOVING "." AND ".." AND "//" "///" (etc.) FROM URI
+             * УДАЛЯЕМ "." И ".." И "//" "///" (и т.п.) ИЗ URI
              * #################
              */
             $pathSplit = explode('/', $path);
@@ -326,7 +326,7 @@ class Main
 
             /**
              * #################
-             * GETTING PREVIOUS PATH
+             * ПОЛУЧАЕМ РОДИТЕЛЬСКУЮ ПАПКУ
              * #################
              */
             $prevPathSplit = $newPathSplit;
@@ -338,14 +338,14 @@ class Main
 
             /**
              * #################
-             * PATH TO TARGET FILE OR DIRECTORY ON LOCAL MACHINE
+             * ПУТЬ К ЦЕЛЕВОМУ ФАЙЛУ ИЛИ ПАПКЕ НА ЛОКАЛЬНОЙ МАШИНЕ
              * #################
              */
             $target = $this->config->DocumentRoot . rawurldecode($newPath);
             if (is_dir($target))
             {
                 $dirContentPage = $this->GetDirContentPage($request->RequestUri, $prevDirectory, $target);
-                $response->End($dirContentPage); // Print directory content
+                $response->End($dirContentPage); // Выводим содержимое папки
                 return;
             }
 
@@ -377,21 +377,21 @@ HTML;
 
             /**
              * #################
-             * GETTING MIME TYPE
+             * ПОЛУЧАЕМ ТИП ФАЙЛА
              * #################
              */
             $extension = strtolower(pathinfo($target, PATHINFO_EXTENSION));
             $mime = $this->GetMimeByExtension($extension);
 
             /**
-             * SETTING NON BLOCK MODE FOR VIDEO AND AUDIO
+             * УСТАНАВЛИВАЕМ НЕБЛОКИРУЮЩИЙ РЕЖИМ ДЛЯ АУДИО ИЛИ ВИДЕО
              *
-             * * WHY NOT FOR ANY TYPE?
-             * IF WE ARE USING NON BLOCK MODE FOR LARGE FILES, IT MAY RESULT IN DATA LOSING
+             * * ПОЧЕМУ НЕ ДЛЯ КАЖДОГО ТИПА?
+             * ЕСЛИ БУДЕМ СТАВИТЬ НЕБЛОКИРУЮЩИЙ РЕЖИМ ДЛЯ БОЛЬШИХ ФАЙЛОВ, ЭТО МОЖЕТ ПРИВЕСТИ К ПОТЕРЕ ДАННЫХ ПРИ СКАЧИВАНИИ ФАЙЛА
              *
-             * * OKAY. WHY WE SET NON BLOCK MODE FOR AUDIO AND VIDEO?
-             * BECAUSE WHEN BROWSER IS LOADING PLAYABLE MEDIA CONTENT AND WE'RE SENDING DATA,
-             * BROWSER MAY NOT RESPOND WHILE IT IS LOADING ALREADY LOADED DATA AND YOUR APPLICATION WILL GET STUCK FOR SEVERAL SECONDS
+             * * ЛАДНО. ПОЧЕМУ СТАВИМ НЕБЛОКИРУЮЩИЙ РЕЖИМ ИМЕННО ДЛЯ АУДИО ИЛИ ВИДЕО?
+             * ПОТОМУ ЧТО КОГДА БРАУЗЕР ВОСПРОИЗВОДИТ МЕДИА-КОНТЕНТ, А МЫ В ЭТО ВРЕМЯ ШЛЁМ ЕМУ ДАННЫЕ,
+             * БРАУЗЕР МОЖЕТ НЕ ОТВЕЧАТЬ СЕРВЕРУ, ПОКА ОН ВОСПРОИЗВОДИТ УЖЕ ЗАГРУЖЕННЫЙ КОНТЕНТ И ПРИЛОЖЕНИЕ МОЖЕТ ПОВИСНУТЬ НА НЕСКОЛЬКО СЕКУНД
              */
             if (in_array(explode('/', $mime)[0], ["video", "audio"]))
             {
@@ -400,22 +400,22 @@ HTML;
 
             /**
              * #################
-             * OPENING FILE
+             * ОТКРЫВАЕМ ФАЙЛ
              * #################
              */
             $file = @fopen($target, "r");
 
             /**
              * #################
-             * SETTING HTTP 200 AND MIME TYPE
+             * УСТАНАВЛИВАЕМ КОД 200 И ШЛЁМ ТИП СОДЕРЖИМОГО
              * #################
              */
             $response->Status(200);
             $response->Header("Content-Type", $mime);
 
             /**
-             * We'll send content using async task to do not block whole process,
-             * because file content may be large
+             * Чтобы не нагружать приложение обработкой большого объёма информации,
+             * будем запрос обрабатывать в асинхронной задаче
              */
             try
             {
@@ -423,7 +423,7 @@ HTML;
             }
             catch (\Throwable $t)
             {
-                Console::WriteLine("Opening file " . $target . " failed. " . $t->getMessage(), ForegroundColors::RED);
+                Console::WriteLine("Не удалось открыть файл " . $target . ". " . $t->getMessage(), ForegroundColors::RED);
 
                 $_500 = <<<HTML
 
@@ -457,7 +457,7 @@ HTML;
         }
         catch (ServerStartException $e)
         {
-            Console::WriteLine("Failed to start server. " . $e->getMessage(), ForegroundColors::RED);
+            Console::WriteLine("Ошибка запуска веб-сервера. " . $e->getMessage(), ForegroundColors::RED);
             exit;
         }
     }

@@ -24,13 +24,13 @@ class Chat
         $this->main = $main;
 
         /**
-         * This async task will check every second for "zombie" users
+         * Эта асинхронная задача каждую секунду проверяет на наличие "зомби"-юзеров
          */
         new AsyncTask($this, 1000, false, function(AsyncTask $task, IAsyncTaskParameters $params) : void
         {
             foreach ($this->users as $key => $user)
             {
-                // If user doesn't reconnect for 50 seconds, then kick him
+                // Если юзер не переподключается в течение 50 секунд, кикаем его
                 if (($user->LastActive + 50) < time())
                 {
                     $this->Kick($user->Username, "timed out");
@@ -81,7 +81,7 @@ class Chat
         );
 
         /**
-         * If it's not disconnect and player was kicked by server or from console
+         * Если пользователь не сам отключился, а был исключён сервером или из консоли
          */
         if (!$disconnected)
         {
@@ -104,7 +104,7 @@ class Chat
         $user->AccessToken = "";
 
         /**
-         * Broadcasting message
+         * Пишем сообщение в чат
          */
         $this->PublishEvent($data);
         unset($this->users[$lusername]);
@@ -116,7 +116,7 @@ class Chat
         {
             if ($user->Response !== null)
             {
-                // Sending published event to users
+                // Отправляем событие всем юзерам
                 $user->Response->End(base64_encode(json_encode($data)));
                 $user->TaskCloser->Cancel();
                 $user->Response = null;
@@ -124,8 +124,8 @@ class Chat
             }
             else
             {
-                // If the user lost connection, add an event to the array.
-                // After the user restores the connection, he will immediately see a new event
+                // Если пользователь потерял соединение, пишем событие в массив
+                // Как пользователь переподключится, он увидит все пропущенные события
                 $user->UnreadEvents[] = $data;
             }
         }
@@ -186,19 +186,19 @@ class Chat
         switch ($row["type"])
         {
             case "start":
-                $output .= ColoredString::Get("Chat started!", ForegroundColors::GREEN);
+                $output .= ColoredString::Get("Начало чата!", ForegroundColors::GREEN);
                 break;
 
             case "connected":
-                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("joined!", ForegroundColors::GREEN);
+                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("вошёл!", ForegroundColors::GREEN);
                 break;
 
             case "disconnected":
-                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("disconnected", ForegroundColors::YELLOW);
+                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("покинул чат", ForegroundColors::YELLOW);
                 break;
 
             case "kicked":
-                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("kicked (" . $row["reason"] . ")", ForegroundColors::RED);
+                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("исключён (" . $row["reason"] . ")", ForegroundColors::RED);
                 break;
 
             case "message":

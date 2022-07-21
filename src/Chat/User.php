@@ -18,9 +18,9 @@ class User
     public ?MenuBoxItem $MenuBoxItem;
 
     /**
-     * 0 - not authorized
-     * 1 - authorized
-     * 2 - logged in from another tab
+     * 0 - не авторизован
+     * 1 - авторизован
+     * 2 - использует другую вкладку
      */
     public function IsAuthorized(Request $request, Response $response, bool $checkAnotherTab) : int
     {
