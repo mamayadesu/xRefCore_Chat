@@ -341,7 +341,7 @@ class Chat {
     }
     
     leave() {
-        if(confirm("Покинуть чат?")) {
+        if(confirm("Leave chat?")) {
             this.lp.halt();
             var http = new XMLHttpRequest();
             http.open('GET', "logout", true);
