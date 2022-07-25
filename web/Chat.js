@@ -101,14 +101,14 @@ class Chat {
             {
                 document.getElementById("lc").style.display = "";
                 window.alert("Connection lost.");
+                console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Connection lost", data]);
             }
             self.lostconnection = true;
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Connection lost", data]);
         });
             
         this.lp.on("timeout", function() {
             window.alert("Утеряно соединение с сервером.");
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Malp]", "Connection timeout"]);
+            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Connection timeout"]);
         });
             
         this.lp.on("hibernation", function() {
