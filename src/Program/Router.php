@@ -343,7 +343,7 @@ class Router
         }
 
         // Удаляем пользователя из чата
-        $this->main->chat->Kick($user->Username, "", true);
+        $this->main->chat->Kick($user->Username, "", "disconnected");
 
         $response->End("OK");
     }

@@ -73,7 +73,7 @@ class Chat {
             } else if(data["type"] == "disconnected") {
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" покинул чат (disconnected).</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "timed out") {
-                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" покинул чат ("+data["username"]+" timed out).</i></pre>"+document.getElementById("messages").innerHTML;
+                document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" покинул чат ("+data["username"]+" потерял соединение с сервером).</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "kicked") {
                 if(data['username'] == self.username) {
                     self.lp.halt();
@@ -101,14 +101,14 @@ class Chat {
             {
                 document.getElementById("lc").style.display = "";
                 window.alert("Ошибка подключения к серверу.");
+                console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Ошибка соединения с сервером", data]);
             }
             self.lostconnection = true;
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Ошибка соединения с сервером", data]);
         });
             
         this.lp.on("timeout", function() {
             window.alert("Утеряно соединение с сервером.");
-            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Malp]", "Время ожидания истекло"]);
+            console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Время ожидания истекло"]);
         });
             
         this.lp.on("hibernation", function() {

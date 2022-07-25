@@ -35,7 +35,7 @@ class Chat
                 // Если юзер не переподключается в течение 50 секунд, кикаем его
                 if (($user->LastActive + 50) < time())
                 {
-                    $this->Kick($user->Username, "timed out");
+                    $this->Kick($user->Username, "", "timed out");
                 }
             }
         });
@@ -68,7 +68,7 @@ class Chat
         $this->users[strtolower($user->Username)] = $user;
     }
 
-    public function Kick(string $username, string $reason, bool $disconnected = false) : void
+    public function Kick(string $username, string $reason, string $type = "kicked") : void
     {
         $lusername = strtolower($username);
         $user = $this->users[$lusername] ?? null;
@@ -76,16 +76,13 @@ class Chat
             return;
 
         $data = array(
-            "type" => $disconnected ? "disconnected" : "kicked",
+            "type" => $type,
             "username" => $user->Username,
             "time" => time(),
             "date" => date("d.m.Y H:i:s", time())
         );
 
-        /**
-         * Если пользователь не сам отключился, а был исключён сервером или из консоли
-         */
-        if (!$disconnected)
+        if (!$type == "kicked")
         {
             $data["reason"] = $reason;
         }
