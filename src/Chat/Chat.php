@@ -35,7 +35,7 @@ class Chat
                 // If user doesn't reconnect for 50 seconds, then kick him
                 if (($user->LastActive + 50) < time())
                 {
-                    $this->Kick($user->Username, "timed out");
+                    $this->Kick($user->Username, "", "timed out");
                 }
             }
         });
@@ -68,7 +68,7 @@ class Chat
         $this->users[strtolower($user->Username)] = $user;
     }
 
-    public function Kick(string $username, string $reason, bool $disconnected = false) : void
+    public function Kick(string $username, string $reason, string $type = "kicked") : void
     {
         $lusername = strtolower($username);
         $user = $this->users[$lusername] ?? null;
@@ -76,16 +76,13 @@ class Chat
             return;
 
         $data = array(
-            "type" => $disconnected ? "disconnected" : "kicked",
+            "type" => $type,
             "username" => $user->Username,
             "time" => time(),
             "date" => date("d.m.Y H:i:s", time())
         );
 
-        /**
-         * If it's not disconnect and player was kicked by server or from console
-         */
-        if (!$disconnected)
+        if ($type == "kicked")
         {
             $data["reason"] = $reason;
         }
@@ -201,6 +198,10 @@ class Chat
 
             case "kicked":
                 $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("kicked (" . $row["reason"] . ")", ForegroundColors::RED);
+                break;
+
+            case "timed out":
+                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("lost connection", ForegroundColors::DARK_RED);
                 break;
 
             case "message":
