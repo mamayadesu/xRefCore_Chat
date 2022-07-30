@@ -200,6 +200,10 @@ class Chat
                 $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("исключён (" . $row["reason"] . ")", ForegroundColors::RED);
                 break;
 
+            case "timed out":
+                $output .= $date . ColoredString::Get($row["username"], ForegroundColors::PURPLE) . " " . ColoredString::Get("потерял соединение с сервером", ForegroundColors::DARK_RED);
+                break;
+
             case "message":
                 $output .= $date . ColoredString::Get($row["sender"], ForegroundColors::PURPLE) . ": " . ColoredString::Get($row["message"], ForegroundColors::WHITE);
                 break;
