@@ -12,7 +12,7 @@ use Scheduler\AsyncTask;
 class User
 {
     public string $Username, $AccessToken, $IpAddress;
-    public int $LastActive;
+    public int $LastActive, $LastType;
     public ?AsyncTask $TaskCloser = null;
     public ?Request $Request = null;
     public ?Response $Response = null;

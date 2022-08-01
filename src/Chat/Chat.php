@@ -109,10 +109,12 @@ class Chat
         unset($this->users[$lusername]);
     }
 
-    public function PublishEvent(array $data) : void
+    public function PublishEvent(array $data, bool $save = true) : void
     {
         foreach ($this->users as $user)
         {
+            if ($data["type"] == "typing" && $data["username"] == $user->Username)
+                continue;
             if ($user->Response !== null)
             {
                 // Sending published event to users
@@ -121,13 +123,17 @@ class Chat
                 $user->Response = null;
                 $user->Request = null;
             }
-            else
+            else if ($save)
             {
                 // If the user lost connection, add an event to the array.
                 // After the user restores the connection, he will immediately see a new event
                 $user->UnreadEvents[] = $data;
             }
         }
+
+        if (!$save)
+            return;
+
         $this->history[] = $data;
 
         if ($this->WindowLogOpened)

@@ -54,6 +54,10 @@ class Router
                 $this->Logout($request, $response);
                 break;
 
+            case "/typing":
+                $this->Typing($request, $response);
+                break;
+
             default:
                 return false;
         }
@@ -151,6 +155,7 @@ class Router
         $user->AccessToken = md5(md5(rand(1, 1000) . " " . microtime(true)));
         $user->Username = $request->Post["username"];
         $user->LastActive = time();
+        $user->LastType = 0;
         $user->MenuBoxItem = new MenuBoxItem($user->Username, "", function(ItemClickedEvent $event) : void
         {
             $this->main->mainMenu->KickUser($event);
@@ -346,5 +351,42 @@ class Router
         $this->main->chat->Kick($user->Username, "", "disconnected");
 
         $response->End("OK");
+    }
+
+    public function Typing(Request $request, Response $response) : void
+    {
+        if (!isset($request->Cookie["username"]) || !isset($request->Cookie["access_token"]))
+        {
+            $response->End("");
+            return;
+        }
+
+        /** @var User|null $user */$user = $this->main->chat->GetUser($request->Cookie["username"]);
+        if ($user === null)
+        {
+            $response->End("");
+            return;
+        }
+
+        $isAuthorized = $user->IsAuthorized($request, $response, false);
+        if ($isAuthorized !== 1)
+        {
+            $response->End("");
+            return;
+        }
+
+        if ((time() - $user->LastType) < 2)
+        {
+            $response->End("");
+            return;
+        }
+
+        $user->LastType = time();
+
+        $this->main->chat->PublishEvent(array(
+            "type" => "typing",
+            "username" => $user->Username,
+        ), false);
+        $response->End("");
     }
 }

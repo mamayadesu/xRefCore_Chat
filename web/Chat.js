@@ -2,6 +2,7 @@ class Chat {
     constructor() {
         this.lp = null;
         
+        this.typing = new Typing();
         this.username = getCookie("username");
         this.timestart = (new Date).getTime() / 1000;
         this.lostconnection = false;
@@ -35,7 +36,7 @@ class Chat {
                     if(http.responseText == "YES") {
                         self.chat.style.display = "";
                         self.auth.style.display = "none";
-                        start();
+                        self.start();
                     } else if(http.responseText == "NO") {
                         self.auth.style.display = "";
                         self.chat.style.display = "none";
@@ -65,16 +66,19 @@ class Chat {
                 window.alert("Connection restored!");
             }
             if(data["type"] == "message") {
+                self.typing.unsetTypingUser(data["sender"]);
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <b>"+data['sender']+":</b> "+data['message']+"</pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "system") {
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>"+data['message']+"</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "connected") {
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" joined to chat.</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "disconnected") {
+                self.typing.unsetTypingUser(data["username"]);
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" left (disconnected).</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "timed out") {
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" left ("+data["username"]+" timed out).</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "kicked") {
+                self.typing.unsetTypingUser(data["username"]);
                 if(data['username'] == self.username) {
                     self.lp.halt();
                     var kicktext = "You were kicked by next reason: "+data["reason"];
@@ -88,6 +92,8 @@ class Chat {
                     self.auth.style.display = "block";
                 }
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>User "+data["username"]+" left ("+data['reason']+").</i></pre>"+document.getElementById("messages").innerHTML;
+            } else if(data["type"] == "typing") {
+                self.typing.setTypingUser(data["username"]);
             }
             console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "New data received", data]);
         });
