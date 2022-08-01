@@ -82,7 +82,7 @@ class Chat
             "date" => date("d.m.Y H:i:s", time())
         );
 
-        if (!$type == "kicked")
+        if ($type == "kicked")
         {
             $data["reason"] = $reason;
         }
@@ -109,10 +109,12 @@ class Chat
         unset($this->users[$lusername]);
     }
 
-    public function PublishEvent(array $data) : void
+    public function PublishEvent(array $data, bool $save = true) : void
     {
         foreach ($this->users as $user)
         {
+            if ($data["type"] == "typing" && $data["username"] == $user->Username)
+                continue;
             if ($user->Response !== null)
             {
                 // Отправляем событие всем юзерам
@@ -121,13 +123,17 @@ class Chat
                 $user->Response = null;
                 $user->Request = null;
             }
-            else
+            else if ($save)
             {
                 // Если пользователь потерял соединение, пишем событие в массив
                 // Как пользователь переподключится, он увидит все пропущенные события
                 $user->UnreadEvents[] = $data;
             }
         }
+
+        if (!$save)
+            return;
+
         $this->history[] = $data;
 
         if ($this->WindowLogOpened)
