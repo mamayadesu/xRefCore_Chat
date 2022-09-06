@@ -81,19 +81,7 @@ class Router
             $response->End("NO");
             return;
         }
-        switch ($user->IsAuthorized($request, $response, true))
-        {
-            case 0:
-                $response->End("NO");
-                break;
-
-            case 1:
-                $response->End("YES");
-                break;
-
-            case 2:
-                $response->End("ANOTHERTAB");
-        }
+        $response->End($user->IsAuthorized($request, $response) ? "YES" : "NO");
     }
 
     /**
@@ -156,7 +144,7 @@ class Router
         $user->Username = $request->Post["username"];
         $user->LastActive = time();
         $user->LastType = 0;
-        $user->MenuBoxItem = new MenuBoxItem($user->Username, "", function(ItemClickedEvent $event) : void
+        $user->MenuBoxItem = new MenuBoxItem($user->Username, $user->IpAddress, function(ItemClickedEvent $event) : void
         {
             $this->main->mainMenu->KickUser($event);
         });
@@ -190,12 +178,6 @@ class Router
             "date" => date("d.m.Y H:i:s", time())
         )));
 
-        $anothertab = base64_encode(json_encode(array(
-            "type" => "anothertab",
-            "username" => $request->Cookie["username"] ?? "",
-            "time" => time(),
-            "date" => date("d.m.Y H:i:s", time())
-        )));
         if (!isset($request->Cookie["username"]) || !isset($request->Cookie["access_token"]))
         {
             $response->End($unauthorized);
@@ -209,15 +191,10 @@ class Router
             return;
         }
 
-        $isAuthorized = $user->IsAuthorized($request, $response, true);
-        if ($isAuthorized === 0)
+        $isAuthorized = $user->IsAuthorized($request, $response);
+        if (!$isAuthorized)
         {
             $response->End($unauthorized);
-            return;
-        }
-        if ($isAuthorized === 2)
-        {
-            $response->End($anothertab);
             return;
         }
 
@@ -257,17 +234,28 @@ class Router
         // В противном случае закрываем соединение
         $params = new AsyncTaskUserParams();
         $params->User = $user;
-        $user->Request = $request;
-        $user->Response = $response;
+        $params->Request = $request;
+        $params->Response = $response;
+        $user->Request[] = $request;
+        $user->Response[] = $response;
         $user->LastActive = time();
 
-        $user->TaskCloser = new AsyncTask($this, 25000, true, function(AsyncTask $task, AsyncTaskUserParams $params) : void
+        $user->TaskCloser[] = new AsyncTask($this, 25000, true, function(AsyncTask $task, AsyncTaskUserParams $params) : void
         {
             $user = $params->User;
-            $user->Response->End("");
-            $user->Request = null;
-            $user->Response = null;
-            $user->TaskCloser = null;
+
+            $request = $params->Request;
+            $response = $params->Response;
+            $response->End("");
+
+            unset($user->Request[array_search($request, $user->Request)]);
+            unset($user->Response[array_search($response, $user->Response)]);
+
+            $user->Request = array_values($user->Request);
+            $user->Response = array_values($user->Response);
+
+            unset($user->TaskCloser[array_search($task, $user->TaskCloser)]);
+            $user->TaskCloser = array_values($user->TaskCloser);
 
         }, $params);
     }
@@ -287,15 +275,10 @@ class Router
             return;
         }
 
-        $isAuthorized = $user->IsAuthorized($request, $response, false);
-        if ($isAuthorized === 0)
+        $isAuthorized = $user->IsAuthorized($request, $response);
+        if (!$isAuthorized)
         {
             $response->End("NOTAUTHORIZED");
-            return;
-        }
-        if ($isAuthorized === 2)
-        {
-            $response->End("ANOTHERTAB");
             return;
         }
 
@@ -340,8 +323,8 @@ class Router
             return;
         }
 
-        $isAuthorized = $user->IsAuthorized($request, $response, false);
-        if ($isAuthorized !== 1)
+        $isAuthorized = $user->IsAuthorized($request, $response);
+        if (!$isAuthorized)
         {
             $response->End("");
             return;
@@ -368,8 +351,8 @@ class Router
             return;
         }
 
-        $isAuthorized = $user->IsAuthorized($request, $response, false);
-        if ($isAuthorized !== 1)
+        $isAuthorized = $user->IsAuthorized($request, $response);
+        if (!$isAuthorized)
         {
             $response->End("");
             return;
