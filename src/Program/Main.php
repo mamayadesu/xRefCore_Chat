@@ -4,6 +4,7 @@ declare(ticks=1);
 
 namespace Program;
 
+use Application\Application;
 use Chat\Chat;
 use Data\String\ForegroundColors;
 use HttpServer\Exceptions\ServerStartException;
@@ -12,6 +13,7 @@ use HttpServer\Response;
 use HttpServer\Server;
 use IO\Console;
 use Scheduler\AsyncTask;
+use Scheduler\IAsyncTaskParameters;
 
 class Main
 {

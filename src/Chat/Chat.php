@@ -88,15 +88,22 @@ class Chat
         }
         $user->LastActive = 0;
         $user->UnreadEvents = array();
-        if ($user->TaskCloser !== null)
+        if (count($user->TaskCloser) > 0)
         {
-            $user->TaskCloser->Cancel();
+            foreach ($user->TaskCloser as $task)
+            {
+                $task->Cancel();
+            }
+            $user->TaskCloser = [];
         }
-        $user->Request = null;
-        if ($user->Response !== null)
+        $user->Request = [];
+        if (count($user->Response) > 0)
         {
-            $user->Response->End(base64_encode(json_encode($data)));
-            $user->Response = null;
+            foreach ($user->Response as $response)
+            {
+                $response->End(base64_encode(json_encode($data)));
+            }
+            $user->Response = [];
         }
         $user->MenuBoxItem->Remove();
         $user->MenuBoxItem = null;
@@ -115,13 +122,23 @@ class Chat
         {
             if ($data["type"] == "typing" && $data["username"] == $user->Username)
                 continue;
-            if ($user->Response !== null)
+            if (count($user->Response) > 0)
             {
                 // Sending published event to users
-                $user->Response->End(base64_encode(json_encode($data)));
-                $user->TaskCloser->Cancel();
-                $user->Response = null;
-                $user->Request = null;
+
+                foreach ($user->Response as $response)
+                {
+                    $response->End(base64_encode(json_encode($data)));
+                }
+
+                foreach ($user->TaskCloser as $task)
+                {
+                    $task->Cancel();
+                }
+
+                $user->TaskCloser = [];
+                $user->Response = [];
+                $user->Request = [];
             }
             else if ($save)
             {
@@ -163,7 +180,7 @@ class Chat
                 break;
             }
         }
-        if ($k <= $historyLimit)
+        if ($k < $historyLimit)
         {
             $lastElements[] = array(
                 "type" => "start",

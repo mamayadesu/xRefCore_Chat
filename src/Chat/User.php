@@ -13,9 +13,21 @@ class User
 {
     public string $Username, $AccessToken, $IpAddress;
     public int $LastActive, $LastType;
-    public ?AsyncTask $TaskCloser = null;
-    public ?Request $Request = null;
-    public ?Response $Response = null;
+
+    /**
+     * @var array<AsyncTask>
+     */
+    public array $TaskCloser = [];
+
+    /**
+     * @var array<Request>
+     */
+    public array $Request = [];
+
+    /**
+     * @var array<Response>
+     */
+    public array $Response = [];
     public array $UnreadEvents = array();
     public ?MenuBoxItem $MenuBoxItem;
 
@@ -24,25 +36,19 @@ class User
      * 1 - authorized
      * 2 - logged in from another tab
      */
-    public function IsAuthorized(Request $request, Response $response, bool $checkAnotherTab) : int
+    public function IsAuthorized(Request $request, Response $response) : bool
     {
         if (!isset($request->Cookie["username"]) || !isset($request->Cookie["access_token"]) || strtolower($request->Cookie["username"]) !== strtolower($this->Username))
-            return 0;
+            return false;
 
         if (
             $this->AccessToken !== $request->Cookie["access_token"] ||
             $this->IpAddress !== $request->RemoteAddress
         )
         {
-            return 0;
+            return false;
         }
 
-        if ($checkAnotherTab)
-        {
-            if ($this->Request !== null && $this->Request !== $request)
-                return 2;
-        }
-
-        return 1;
+        return true;
     }
 }
