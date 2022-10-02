@@ -97,7 +97,10 @@ class LongPoll
                                             data = JSON.parse(r);
                                         }
                                     }
-                                    self.triggerEvent("data", data);
+                                    if ((typeof data == "string" && data.length > 0) || typeof data == "object")
+                                    {
+                                        self.triggerEvent("data", data);
+                                    }
                                 }
                             }
                         }

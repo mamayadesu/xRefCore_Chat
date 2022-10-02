@@ -150,14 +150,13 @@ class Router
         });
         $this->main->mainMenu->UsersMenuBox->AddItem($user->MenuBoxItem);
 
-        $this->main->chat->PublishEvent(array(
+        $this->main->chat->AddUser($user);
+        $this->main->chat->Broadcast(array(
             "type" => "connected",
             "username" => $user->Username,
             "time" => time(),
             "date" => date("d.m.Y H:i:s", time())
-        ));
-
-        $this->main->chat->AddUser($user);
+        ), true, [strtolower($user->Username)]);
 
         $response->SetCookie("username", $user->Username, time() + 60 * 60 * 24 * 30);
         $response->SetCookie("access_token", $user->AccessToken, time() + 60 * 60 * 24 * 30);
@@ -209,7 +208,7 @@ class Router
             {
                 $result .= base64_encode(json_encode($row)) . "\n";
             }
-
+            $result .= base64_encode(json_encode($this->main->chat->GetUsersListData()));
             $response->End($result);
             return;
         }
@@ -293,7 +292,7 @@ class Router
         $message = str_replace("\n", "<br>", $message);
         $message = str_replace("\r", "", $message);
 
-        $this->main->chat->PublishEvent(array(
+        $this->main->chat->Broadcast(array(
             "type" => "message",
             "message" => $message,
             "sender" => $user->Username,
@@ -366,10 +365,10 @@ class Router
 
         $user->LastType = time();
 
-        $this->main->chat->PublishEvent(array(
+        $this->main->chat->Broadcast(array(
             "type" => "typing",
             "username" => $user->Username,
-        ), false);
+        ), false, [strtolower($user->Username)]);
         $response->End("");
     }
 }

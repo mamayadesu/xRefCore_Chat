@@ -283,6 +283,20 @@ class Main
         {
             /**
              * #################
+             * ПОДДЕРЖКА CLOUDFLARE
+             * #################
+             */
+            if (isset($request->Headers["CF-Connecting-IP"]))
+            {
+                try
+                {
+                    $request->RemoteAddress = $request->Headers["CF-Connecting-IP"];
+                }
+                catch (\Throwable $e)
+                {}
+            }
+            /**
+             * #################
              * ПРЕЖДЕ ВСЕГО ОБРАЩАЕМСЯ К МАРШРУТИЗАТОРУ
              * #################
              */

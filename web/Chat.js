@@ -2,6 +2,7 @@ class Chat {
     constructor() {
         this.lp = null;
         
+        this.list = [];
         this.typing = new Typing();
         this.username = getCookie("username");
         this.timestart = (new Date).getTime() / 1000;
@@ -94,6 +95,9 @@ class Chat {
                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data["username"]+" покинул чат ("+data['reason']+").</i></pre>"+document.getElementById("messages").innerHTML;
             } else if(data["type"] == "typing") {
                 self.typing.setTypingUser(data["username"]);
+            } else if(data["type"] == "list") {
+                self.list = data["list"];
+                self.handleUsersList();
             }
             console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Получены новые данные", data]);
         });
@@ -113,7 +117,6 @@ class Chat {
         });
             
         this.lp.on("timeout", function() {
-            window.alert("Утеряно соединение с сервером.");
             console.log.apply(console, [/*"["+ Math.ceil((((new Date).getTime() / 1000)) - timestart) +"]"*/"[Chat]", "Время ожидания истекло"]);
         });
             
@@ -125,6 +128,17 @@ class Chat {
                 window.alert("Соединение с сервером восстановлено!");
             }
         });
+    }
+    
+    handleUsersList()
+    {
+        var el = document.getElementById("userslist");
+        el.innerHTML = "<tr><th>Список пользователей</th></tr>";
+
+        for (var k in this.list)
+        {
+            el.innerHTML += "<tr><td>" + this.list[k] + "</td></tr>";
+        }
     }
     
     loadMessages() {
@@ -172,6 +186,9 @@ class Chat {
                                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data['username']+" покинул чат ("+data['username']+" timed out).</i></pre>"+document.getElementById("messages").innerHTML;
                             } else if(data["type"] == "kicked") {
                                 document.getElementById("messages").innerHTML = "<pre><u>"+data["date"]+"</u> <i>Пользователь "+data['username']+" покинул чат ("+data['reason']+").</i></pre>"+document.getElementById("messages").innerHTML;
+                            } else if(data["type"] == "list") {
+                                self.list = data["list"];
+                                self.handleUsersList();
                             }
                         }
                     }
