@@ -112,15 +112,64 @@ class Chat
         /**
          * Broadcasting message
          */
-        $this->PublishEvent($data);
         unset($this->users[$lusername]);
+        $this->Broadcast($data);
     }
 
-    public function PublishEvent(array $data, bool $save = true) : void
+    public function SendMessage(string $username, array $data) : void
     {
+        $username = strtolower($username);
+
+        if (!isset($this->users[$username]))
+            return;
+
+        $user = $this->users[$username];
+        if (count($user->Response) > 0)
+        {
+            // Sending published event to users
+
+            foreach ($user->Response as $response)
+            {
+                $response->End(base64_encode(json_encode($data)) . "\n");
+            }
+
+            foreach ($user->TaskCloser as $task)
+            {
+                $task->Cancel();
+            }
+
+            $user->TaskCloser = [];
+            $user->Response = [];
+            $user->Request = [];
+        }
+        else
+        {
+            // If the user lost connection, add an event to the array.
+            // After the user restores the connection, he will immediately see a new event
+            $user->UnreadEvents[] = $data;
+        }
+    }
+
+    public function GetUsersListData() : array
+    {
+        $usersList = array
+        (
+            "type" => "list",
+            "list" => []
+        );
         foreach ($this->users as $user)
         {
-            if ($data["type"] == "typing" && $data["username"] == $user->Username)
+            $usersList["list"][] = $user->Username;
+        }
+        return $usersList;
+    }
+
+    public function Broadcast(array $data, bool $save = true, $excludeUsernames = []) : void
+    {
+        $usersListPrepared = base64_encode(json_encode((in_array($data["type"], ["connected", "disconnected", "kicked", "timed out"])) ? $this->GetUsersListData() : ""));
+        foreach ($this->users as $lusername => $user)
+        {
+            if (in_array($lusername, $excludeUsernames))
                 continue;
             if (count($user->Response) > 0)
             {
@@ -128,7 +177,7 @@ class Chat
 
                 foreach ($user->Response as $response)
                 {
-                    $response->End(base64_encode(json_encode($data)));
+                    $response->End(base64_encode(json_encode($data)) . "\n" . $usersListPrepared);
                 }
 
                 foreach ($user->TaskCloser as $task)

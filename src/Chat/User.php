@@ -39,7 +39,9 @@ class User
     public function IsAuthorized(Request $request, Response $response) : bool
     {
         if (!isset($request->Cookie["username"]) || !isset($request->Cookie["access_token"]) || strtolower($request->Cookie["username"]) !== strtolower($this->Username))
+        {
             return false;
+        }
 
         if (
             $this->AccessToken !== $request->Cookie["access_token"] ||

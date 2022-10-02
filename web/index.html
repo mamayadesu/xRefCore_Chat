@@ -19,6 +19,8 @@
             <p>You're already logged in from another browser tab</p>
         </div>
         <div id="chat">
+            <table border style="position: absolute; right: 20px;" id="userslist">
+            </table>
             <input type="button" value="Leave chat" onclick="chat.leave();">
             <h4>Message</h4>
             <b style="color: red; font-size: 80%;" id="lc">Connection was lost.<br>Trying to restore connection...<br><br></b>
@@ -28,7 +30,7 @@
         
             <div id="result"><span style='color: white;'>_</span></div>
             <div id="typing" style="color: white;">_</div>
-            <hr>
+            <hr style="width: 80%; margin-left: 0;">
             <div id="sending_message"></div>
             <div id="messages"></div>
         </div>
