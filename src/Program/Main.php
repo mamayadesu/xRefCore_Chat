@@ -416,18 +416,26 @@ HTML;
 
             /**
              * #################
-             * ОТКРЫВАЕМ ФАЙЛ
+             * УСТАНАВЛИВАЕМ СТАТУС HTTP 200, РАЗМЕР ФАЙЛА И MIME
              * #################
              */
-            $file = @fopen($target, "r");
+            $filesize = filesize($target);
+            $response->Status(200);
+            $response->Header("Content-Type", $mime);
+            $response->Header("Content-Length", $filesize);
 
             /**
              * #################
-             * УСТАНАВЛИВАЕМ КОД 200 И ШЛЁМ ТИП СОДЕРЖИМОГО
+             * ОТКРЫВАЕМ ФАЙЛ
              * #################
              */
-            $response->Status(200);
-            $response->Header("Content-Type", $mime);
+            if ($filesize <= 1024 * 1024 * 1024)
+            {
+                $response->End(@file_get_contents($target));
+                return;
+            }
+
+            $file = @fopen($target, "r");
 
             /**
              * Чтобы не нагружать приложение обработкой большого объёма информации,
