@@ -4,7 +4,6 @@ declare(ticks=1);
 
 namespace Program;
 
-use Application\Application;
 use Chat\Chat;
 use Data\String\ForegroundColors;
 use HttpServer\Exceptions\ServerStartException;
@@ -13,7 +12,6 @@ use HttpServer\Response;
 use HttpServer\Server;
 use IO\Console;
 use Scheduler\AsyncTask;
-use Scheduler\IAsyncTaskParameters;
 
 class Main
 {
@@ -316,10 +314,8 @@ class Main
              * РЕДИРЕКТ НА index.html
              * #################
              */
-            if ($request->RequestUri == "/" && file_exists($this->config->DocumentRoot . "index.html"))
+            if ($request->PathInfo == "/" && file_exists($this->config->DocumentRoot . "index.html"))
             {
-                $request->RequestUri .= "index.html";
-                $request->RequestUrl .= "/index.html";
                 $request->PathInfo .= "index.html";
             }
             $path = $request->PathInfo;
@@ -429,25 +425,20 @@ HTML;
              * ОТКРЫВАЕМ ФАЙЛ
              * #################
              */
-            if ($filesize <= 1024 * 1024 * 1024)
+            if ($filesize <= 1024 * 1024)
             {
                 $response->End(@file_get_contents($target));
                 return;
             }
 
-            $file = @fopen($target, "r");
-
             /**
              * Чтобы не нагружать приложение обработкой большого объёма информации,
              * будем запрос обрабатывать в асинхронной задаче
              */
-            try
+            $file = @fopen($target, "r");
+            if (!$file)
             {
-                $params = new RequestAsyncHandlerParams($file, $response);
-            }
-            catch (\Throwable $t)
-            {
-                Console::WriteLine("Не удалось открыть файл " . $target . ". " . $t->getMessage(), ForegroundColors::RED);
+                Console::WriteLine("Не удалось открыть файл " . $target, ForegroundColors::RED);
 
                 $_500 = <<<HTML
 

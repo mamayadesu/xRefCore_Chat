@@ -209,6 +209,7 @@ class Router
                 $result .= base64_encode(json_encode($row)) . "\n";
             }
             $result .= base64_encode(json_encode($this->main->chat->GetUsersListData()));
+            $response->ClientNonBlockMode = false;
             $response->End($result);
             return;
         }
