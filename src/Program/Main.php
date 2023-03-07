@@ -316,10 +316,8 @@ class Main
              * REDIRECT TO index.html
              * #################
              */
-            if ($request->RequestUri == "/" && file_exists($this->config->DocumentRoot . "index.html"))
+            if ($request->PathInfo == "/" && file_exists($this->config->DocumentRoot . "index.html"))
             {
-                $request->RequestUri .= "index.html";
-                $request->RequestUrl .= "/index.html";
                 $request->PathInfo .= "index.html";
             }
             $path = $request->PathInfo;
@@ -429,25 +427,20 @@ HTML;
              * OPENING FILE
              * #################
              */
-            if ($filesize <= 1024 * 1024 * 1024)
+            if ($filesize <= 1024 * 1024)
             {
                 $response->End(@file_get_contents($target));
                 return;
             }
 
-            $file = @fopen($target, "r");
-
             /**
              * We'll send content using async task to do not block whole process,
              * because file content may be large
              */
-            try
+            $file = @fopen($target, "r");
+            if (!$file)
             {
-                $params = new RequestAsyncHandlerParams($file, $response);
-            }
-            catch (\Throwable $t)
-            {
-                Console::WriteLine("Opening file " . $target . " failed. " . $t->getMessage(), ForegroundColors::RED);
+                Console::WriteLine("Opening file " . $target . " failed.", ForegroundColors::RED);
 
                 $_500 = <<<HTML
 
