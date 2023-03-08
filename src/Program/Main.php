@@ -68,7 +68,10 @@ class Main
         /**
          * Запускаем веб-сервер
          */
-        $this->StartServer();
+        if (!$this->StartServer())
+        {
+            return;
+        }
 
         /**
          * Загружаем главное меню
@@ -263,7 +266,7 @@ class Main
         return $mime;
     }
 
-    public function StartServer() : void
+    public function StartServer() : bool
     {
         if ($this->server !== null)
         {
@@ -461,11 +464,6 @@ HTML;
             new AsyncTask($this, 1, false, [$this, "RequestAsyncHandler"], $params);
         });
 
-        $this->server->On("shutdown", function(Server $server)
-        {
-            exit(0);
-        });
-
         try
         {
             $this->server->Start(true);
@@ -473,7 +471,8 @@ HTML;
         catch (ServerStartException $e)
         {
             Console::WriteLine("Ошибка запуска веб-сервера. " . $e->getMessage(), ForegroundColors::RED);
-            exit;
+            return false;
         }
+        return true;
     }
 }
