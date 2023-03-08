@@ -104,6 +104,6 @@ class MainMenu
     public function Exit(ItemClickedEvent $event) : void
     {
         $this->main->chat->Shutdown();
-        exit;
+        $event->MenuBox->Close();
     }
 }

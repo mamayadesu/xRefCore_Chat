@@ -70,7 +70,10 @@ class Main
         /**
          * Starting Web-server
          */
-        $this->StartServer();
+        if (!$this->StartServer())
+        {
+            return;
+        }
 
         /**
          * Load main menu
@@ -265,7 +268,7 @@ class Main
         return $mime;
     }
 
-    public function StartServer() : void
+    public function StartServer() : bool
     {
         if ($this->server !== null)
         {
@@ -463,11 +466,6 @@ HTML;
             new AsyncTask($this, 1, false, [$this, "RequestAsyncHandler"], $params);
         });
 
-        $this->server->On("shutdown", function(Server $server)
-        {
-            exit(0);
-        });
-
         try
         {
             $this->server->Start(true);
@@ -475,7 +473,8 @@ HTML;
         catch (ServerStartException $e)
         {
             Console::WriteLine("Failed to start server. " . $e->getMessage(), ForegroundColors::RED);
-            exit;
+            return false;
         }
+        return true;
     }
 }
