@@ -11,6 +11,7 @@ use HttpServer\Exceptions\ServerStartException;
 use HttpServer\Request;
 use HttpServer\Response;
 use HttpServer\Server;
+use HttpServer\ServerEvents;
 use IO\Console;
 use Scheduler\AsyncTask;
 use Scheduler\IAsyncTaskParameters;
@@ -282,7 +283,7 @@ class Main
          * REQUEST HANDLER
          * #################
          */
-        $this->server->On("request", function(Request $request, Response $response)
+        $this->server->On(ServerEvents::Request, function(Request $request, Response $response)
         {
             /**
              * #################
