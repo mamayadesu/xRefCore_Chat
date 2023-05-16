@@ -54,7 +54,7 @@ class MainMenu
             if ($event->Key != "backspace")
                 return;
 
-            $username = $event->MenuBox->GetSelectedItem()->Name();
+            $username = $event->MenuBox->GetSelectedItem()->Name;
             $this->main->chat->Kick($username, "Kicked by Console");
         };
         $this->UsersMenuBox->SetZeroItem(new MenuBoxItem("Назад", "", function(ItemClickedEvent $event) : void
@@ -93,7 +93,7 @@ class MainMenu
 
     public function KickUser(ItemClickedEvent $event) : void
     {
-        $username = $event->Item->Name();
+        $username = $event->Item->Name;
         Console::ClearWindow("Укажите причину, по которой выгоняете " . $username . ": ");
         $reason = Console::ReadLine();
 
