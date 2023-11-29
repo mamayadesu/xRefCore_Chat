@@ -54,7 +54,9 @@ class Main
             {
                 // Выключаем чат при Ctrl+C
                 if ($event == PHP_WINDOWS_EVENT_CTRL_C)
-                    $this->chat->Shutdown();
+                {
+                    $this->mainMenu->MainMenuBox->Close();
+                }
             }, true);
         }
         else
@@ -62,7 +64,7 @@ class Main
             pcntl_signal(SIGINT, function() : void
             {
                 // Выключаем чат при Ctrl+C
-                $this->chat->Shutdown();
+                $this->mainMenu->MainMenuBox->Close();
             });
         }
 

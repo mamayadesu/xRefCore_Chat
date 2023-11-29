@@ -8,6 +8,8 @@ use CliForms\Common\RowHeaderType;
 use CliForms\Exceptions\NoItemsAddedException;
 use CliForms\MenuBox\Events\ItemClickedEvent;
 use CliForms\MenuBox\Events\KeyPressEvent;
+use CliForms\MenuBox\Events\MenuBoxCloseEvent;
+use CliForms\MenuBox\Events\MenuBoxOpenEvent;
 use CliForms\MenuBox\MenuBox;
 use CliForms\MenuBox\MenuBoxItem;
 use IO\Console;
@@ -16,7 +18,7 @@ class MainMenu
 {
     private Main $main;
 
-    public MenuBox $UsersMenuBox;
+    public MenuBox $MainMenuBox, $UsersMenuBox;
 
     public function __construct(Main $main)
     {
@@ -28,7 +30,17 @@ class MainMenu
         /**
          * СОЗДАЁМ ГЛАВНОЕ МЕНЮ
          */
-        $menu = new MenuBox("============ Чат на xRefCore ============", $this);
+        $menu = $this->MainMenuBox = new MenuBox("============ Чат на xRefCore ============", $this);
+        $menu->OpenEvent = function(MenuBoxOpenEvent $event) : void
+        {
+            Console::HideCursor();
+        };
+        $menu->CloseEvent = function(MenuBoxCloseEvent $event) : void
+        {
+            $this->main->chat->Shutdown();
+            Console::ShowCursor();
+            exit;
+        };
         $menu->SetRowsHeaderType(RowHeaderType::STARS);
         $menu->SetRowHeaderItemDelimiter(" ");
         $item1 = new MenuBoxItem("Открыть лог", "Нажмите ENTER, чтобы закрыть лог", function(ItemClickedEvent $event) : void { $this->OpenLog($event); });
@@ -46,6 +58,7 @@ class MainMenu
          * СОЗДАЁМ МЕНЮ "ПОЛЬЗОВАТЕЛИ"
          */
         $this->UsersMenuBox = new MenuBox("Список пользователей", $this);
+        $this->UsersMenuBox->AutoSizeEnabled = true;
         $this->UsersMenuBox->SetRowsHeaderType(RowHeaderType::NUMERIC);
         $this->UsersMenuBox->SetRowHeaderItemDelimiter(" ");
         $this->UsersMenuBox->SetDescription("Выберите пользователя и нажмите ENTER, чтобы исключить. Либо выберите пользователя и нажмите BACKSPACE, чтобы сразу выгнать его, не указывая причину");
@@ -103,7 +116,6 @@ class MainMenu
 
     public function Exit(ItemClickedEvent $event) : void
     {
-        $this->main->chat->Shutdown();
         $event->MenuBox->Close();
     }
 }

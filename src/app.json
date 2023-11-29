@@ -1,11 +1,11 @@
 {
     "php_version": "7.4",
     "app_name": "Chat",
-    "app_version": "3.0",
+    "app_version": "3.1",
     "app_author": "xRef",
     "app_description": "Simple web-chat",
     "namespaces": [
         "Chat"
     ],
-    "framework_version": "1.17.0.0"
+    "framework_version": "1.18.0.0"
 }
