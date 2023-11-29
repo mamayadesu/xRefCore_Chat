@@ -56,7 +56,7 @@ class Main
             {
                 // Shutting down chat on CTRL+C
                 if ($event == PHP_WINDOWS_EVENT_CTRL_C)
-                    $this->chat->Shutdown();
+                    $this->mainMenu->MainMenuBox->Close();
             }, true);
         }
         else
@@ -64,7 +64,7 @@ class Main
             pcntl_signal(SIGINT, function() : void
             {
                 // Shutting down chat on CTRL+C
-                $this->chat->Shutdown();
+                $this->mainMenu->MainMenuBox->Close();
             });
         }
 

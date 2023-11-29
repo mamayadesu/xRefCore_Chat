@@ -8,6 +8,8 @@ use CliForms\Common\RowHeaderType;
 use CliForms\Exceptions\NoItemsAddedException;
 use CliForms\MenuBox\Events\ItemClickedEvent;
 use CliForms\MenuBox\Events\KeyPressEvent;
+use CliForms\MenuBox\Events\MenuBoxCloseEvent;
+use CliForms\MenuBox\Events\MenuBoxOpenEvent;
 use CliForms\MenuBox\MenuBox;
 use CliForms\MenuBox\MenuBoxItem;
 use IO\Console;
@@ -16,7 +18,7 @@ class MainMenu
 {
     private Main $main;
 
-    public MenuBox $UsersMenuBox;
+    public MenuBox $MainMenuBox, $UsersMenuBox;
 
     public function __construct(Main $main)
     {
@@ -28,7 +30,17 @@ class MainMenu
         /**
          * CREATING MAIN MENU
          */
-        $menu = new MenuBox("============ Chat built on xRefCore ============", $this);
+        $menu = $this->MainMenuBox = new MenuBox("============ Chat built on xRefCore ============", $this);
+        $menu->OpenEvent = function(MenuBoxOpenEvent $event) : void
+        {
+            Console::HideCursor();
+        };
+        $menu->CloseEvent = function(MenuBoxCloseEvent $event) : void
+        {
+            $this->main->chat->Shutdown();
+            Console::ShowCursor();
+            exit;
+        };
         $menu->SetRowsHeaderType(RowHeaderType::STARS);
         $menu->SetRowHeaderItemDelimiter(" ");
         $item1 = new MenuBoxItem("Open log", "Press ENTER to close log", function(ItemClickedEvent $event) : void { $this->OpenLog($event); });
@@ -46,6 +58,7 @@ class MainMenu
          * CREATING "SHOW USERS" MENU
          */
         $this->UsersMenuBox = new MenuBox("Users list", $this);
+        $this->UsersMenuBox->AutoSizeEnabled = true;
         $this->UsersMenuBox->SetRowsHeaderType(RowHeaderType::NUMERIC);
         $this->UsersMenuBox->SetRowHeaderItemDelimiter(" ");
         $this->UsersMenuBox->SetDescription("Select user and press ENTER to kick him. Or select user and press BACKSPACE to kick him without reason");
@@ -103,7 +116,6 @@ class MainMenu
 
     public function Exit(ItemClickedEvent $event) : void
     {
-        $this->main->chat->Shutdown();
         $event->MenuBox->Close();
     }
 }
